@@ -1,0 +1,912 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Checklist Siap Seminar KP</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: min(100% - 32px, 950px);
+            margin: auto;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, #0f2747, #164e7a);
+            color: white;
+            padding: 40px 0 35px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        header h1 {
+            font-size: clamp(28px, 5vw, 42px);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #dbeafe;
+            max-width: 700px;
+        }
+
+        .deadline {
+            margin-top: 25px;
+            background: white;
+            color: #172033;
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.12);
+        }
+
+        .deadline-label {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .deadline strong {
+            display: block;
+            font-size: 20px;
+            color: #dc2626;
+        }
+
+        #countdown {
+            font-weight: bold;
+            font-size: 18px;
+            white-space: nowrap;
+        }
+
+        /* PROGRESS */
+        .progress-card {
+            background: white;
+            margin: 25px 0;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(15,39,71,.06);
+        }
+
+        .progress-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #e5e7eb;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        #progressFill {
+            height: 100%;
+            width: 0%;
+            background: #16a34a;
+            border-radius: 20px;
+            transition: width .3s ease;
+        }
+
+        /* SECTION */
+        section {
+            background: white;
+            margin-bottom: 20px;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(15,39,71,.06);
+        }
+
+        .section-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .section-header h2 {
+            font-size: 20px;
+            color: #0f2747;
+        }
+
+        .section-header p {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 3px;
+        }
+
+        .checklist {
+            padding: 8px 20px 15px;
+        }
+
+        .item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 13px 0;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item input {
+            width: 19px;
+            height: 19px;
+            margin-top: 3px;
+            cursor: pointer;
+            accent-color: #16a34a;
+            flex-shrink: 0;
+        }
+
+        .item label {
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .item.checked label {
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+
+        code {
+            background: #eef2f7;
+            padding: 2px 6px;
+            border-radius: 5px;
+            color: #334155;
+            font-size: 13px;
+        }
+
+        /* PRIORITY */
+        .priority {
+            border-left: 5px solid #f59e0b;
+        }
+
+        .priority .section-header {
+            background: #fffbeb;
+        }
+
+        /* SEMINAR */
+        .seminar {
+            border-left: 5px solid #2563eb;
+        }
+
+        .seminar .section-header {
+            background: #eff6ff;
+        }
+
+        /* DRIVE */
+        .drive-structure {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 18px;
+            margin: 5px 20px 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        .drive-structure pre {
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* BUTTON */
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin: 20px 0 40px;
+        }
+
+        button {
+            border: none;
+            background: #dc2626;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #b91c1c;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 13px;
+            padding-bottom: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: min(100% - 20px, 950px);
+            }
+
+            header {
+                padding: 30px 0;
+            }
+
+            .deadline {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            #countdown {
+                font-size: 16px;
+            }
+
+            .section-header,
+            .checklist {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .drive-structure {
+                margin-left: 15px;
+                margin-right: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="container">
+
+        <span class="badge">KERJA PRAKTIK • SEMINAR KP</span>
+
+        <h1>Checklist Siap Maju Seminar KP</h1>
+
+        <p>
+            Pastikan administrasi, artefak, laporan, dokumen teknis,
+            dan Google Drive sudah lengkap sebelum submit.
+        </p>
+
+        <div class="deadline">
+            <div>
+                <div class="deadline-label">DEADLINE FORMULIR</div>
+                <strong>8 Oktober 2026 • 23.55 WIB</strong>
+            </div>
+
+            <div id="countdown">
+                Mengecek deadline...
+            </div>
+        </div>
+
+    </div>
+</header>
+
+
+<main class="container">
+
+    <!-- PROGRESS -->
+    <div class="progress-card">
+
+        <div class="progress-top">
+            <span>Progress Checklist</span>
+            <span id="progressText">0 / 0</span>
+        </div>
+
+        <div class="progress-bar">
+            <div id="progressFill"></div>
+        </div>
+
+    </div>
+
+
+    <!-- PRIORITAS UTAMA -->
+    <section class="priority">
+
+        <div class="section-header">
+            <h2>🔥 Prioritas Utama</h2>
+            <p>Ini yang harus dibereskan sebelum submit besok.</p>
+        </div>
+
+        <div class="checklist">
+
+            <div class="item">
+                <input type="checkbox" id="p1">
+                <label for="p1">
+                    Isi formulir siap maju Seminar KP
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="p2">
+                <label for="p2">
+                    Submit formulir sebelum <b>8 Oktober 2026, 23.55 WIB</b>
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="p3">
+                <label for="p3">
+                    Surat Pernyataan Siap Maju Seminar KP sudah diambil dari CIS
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="p4">
+                <label for="p4">
+                    Surat Siap Maju sudah disetujui Dosen Pembimbing
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="p5">
+                <label for="p5">
+                    Dosen Pembimbing sudah diingatkan mengenai nilai bimbingan KP
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="p6">
+                <label for="p6">
+                    Form <code>Ev3-KP-26-AxxG</code> sudah tersedia untuk dosen
+                </label>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- A. PELAKSANAAN -->
+    <section>
+
+        <div class="section-header">
+            <h2>📂 A. Pelaksanaan di Perusahaan</h2>
+            <p>Pastikan seluruh artefak KP sudah tersedia di Google Drive.</p>
+        </div>
+
+        <div class="checklist">
+
+            <div class="item">
+                <input type="checkbox" id="a1">
+                <label for="a1">
+                    <code>Stp-KP-YY-AxxG</code> — Daftar artefak yang dibawa peserta KP
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="a2">
+                <label for="a2">
+                    <code>Ev1-KP-YY-AxxGG</code> — Formulir Penilaian Pelaksanaan KP oleh Perusahaan
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="a3">
+                <label for="a3">
+                    <code>Pres-KP-YY-AxxG-ww</code> — Laporan Kehadiran Harian
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="a4">
+                <label for="a4">
+                    <code>LA-KP-YY-AxxG-ww</code> — Laporan Aktivitas Kegiatan Harian
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="a5">
+                <label for="a5">
+                    <code>MoM-KP-YY-AxxG-ww</code> — Minutes of Meeting
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="a6">
+                <label for="a6">
+                    <code>ToR-KP-YY-AxxG</code> — Term of Reference
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="a7">
+                <label for="a7">
+                    <code>PIP-KP-YY-AxxG</code> — Project Implementation Plan
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="a8">
+                <label for="a8">
+                    Semua dokumen mingguan (<code>Pres</code>, <code>LA</code>, <code>MoM</code>)
+                    sudah tersedia untuk semua minggu
+                </label>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- B. ADMINISTRASI -->
+    <section>
+
+        <div class="section-header">
+            <h2>📑 B. Administrasi & Laporan</h2>
+            <p>Dokumen administrasi, laporan, dan dokumen teknis.</p>
+        </div>
+
+        <div class="checklist">
+
+            <div class="item">
+                <input type="checkbox" id="b1">
+                <label for="b1">
+                    MoM dengan Dosen Pembimbing lengkap
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="b2">
+                <label for="b2">
+                    Surat Pernyataan Siap Maju Seminar KP tersedia
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="b3">
+                <label for="b3">
+                    Surat Siap Maju sudah disetujui Dosen Pembimbing
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="b4">
+                <label for="b4">
+                    <code>Rep-KP-YY-AxxG</code> — Laporan KP versi terbaru/final
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="b5">
+                <label for="b5">
+                    Dokumen Teknis KP sesuai role dan pekerjaan
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="b6">
+                <label for="b6">
+                    Laporan KP sudah mengikuti kaidah penulisan yang baik dan benar
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="b7">
+                <label for="b7">
+                    Dokumen Teknis sudah dirapikan dan layak dinilai
+                </label>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- GOOGLE DRIVE -->
+    <section>
+
+        <div class="section-header">
+            <h2>☁️ Struktur Google Drive</h2>
+            <p>Pastikan struktur folder dan penempatan file sudah benar.</p>
+        </div>
+
+        <div class="drive-structure">
+<pre>[Kode KP]
+│
+├── 📂 A. Pelaksanaan di Perusahaan
+│   ├── Stp-KP-YY-AxxG
+│   ├── Ev1-KP-YY-AxxGG
+│   ├── Pres-KP-YY-AxxG-ww
+│   ├── LA-KP-YY-AxxG-ww
+│   ├── MoM-KP-YY-AxxG-ww
+│   ├── ToR-KP-YY-AxxG
+│   └── PIP-KP-YY-AxxG
+│
+└── 📂 B. Administrasi & Laporan
+    ├── MoM dengan Dosen Pembimbing
+    ├── Surat Pernyataan Siap Maju Seminar KP
+    ├── Rep-KP-YY-AxxG
+    └── Dokumen Teknis KP</pre>
+        </div>
+
+        <div class="checklist">
+
+            <div class="item">
+                <input type="checkbox" id="d1">
+                <label for="d1">
+                    Nama folder utama menggunakan Kode KP
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="d2">
+                <label for="d2">
+                    Folder A. Pelaksanaan di Perusahaan tersedia
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="d3">
+                <label for="d3">
+                    Folder B. Administrasi & Laporan tersedia
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="d4">
+                <label for="d4">
+                    Semua file berada di folder yang benar
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="d5">
+                <label for="d5">
+                    Nama file mengikuti format yang diminta
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="d6">
+                <label for="d6">
+                    Tidak ada dokumen mingguan yang tertinggal
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="d7">
+                <label for="d7">
+                    Semua dokumen dapat dibuka
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="d8">
+                <label for="d8">
+                    Link Google Drive dapat diakses sesuai kebutuhan dosen/penguji
+                </label>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FINAL CHECK -->
+    <section>
+
+        <div class="section-header">
+            <h2>🔎 Final Checking</h2>
+            <p>Pengecekan terakhir sebelum menekan tombol Submit.</p>
+        </div>
+
+        <div class="checklist">
+
+            <div class="item">
+                <input type="checkbox" id="f1">
+                <label for="f1">
+                    Laporan KP adalah versi terbaru
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="f2">
+                <label for="f2">
+                    Dokumen teknis adalah versi terbaru
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="f3">
+                <label for="f3">
+                    Surat Siap Maju sudah disetujui
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="f4">
+                <label for="f4">
+                    Dosen Pembimbing sudah diingatkan mengenai Ev3
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="f5">
+                <label for="f5">
+                    Formulir Siap Maju Seminar KP sudah diisi dengan benar
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="f6">
+                <label for="f6">
+                    Semua pengecekan sudah selesai
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="f7">
+                <label for="f7">
+                    <b>SUBMIT sebelum 23.55 WIB 🚀</b>
+                </label>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SEMINAR -->
+    <section class="seminar">
+
+        <div class="section-header">
+            <h2>🎓 Persiapan Seminar KP</h2>
+            <p>
+                Seminar berlangsung 13–21 Oktober 2026.
+                Tidak harus dikumpulkan besok, tetapi mulai disiapkan.
+            </p>
+        </div>
+
+        <div class="checklist">
+
+            <div class="item">
+                <input type="checkbox" id="s1">
+                <label for="s1">
+                    Slide presentasi
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="s2">
+                <label for="s2">
+                    Demo sistem/proyek
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="s3">
+                <label for="s3">
+                    Pembagian presentasi anggota sudah ditentukan
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="s4">
+                <label for="s4">
+                    Presentasi + demo maksimal 20 menit
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="s5">
+                <label for="s5">
+                    Persiapan tanya jawab 30 menit
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="s6">
+                <label for="s6">
+                    Bahasa Indonesia baku atau English yang baik
+                </label>
+            </div>
+
+            <div class="item">
+                <input type="checkbox" id="s7">
+                <label for="s7">
+                    Demo dapat berjalan tanpa masalah
+                </label>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <div class="actions">
+        <button onclick="resetChecklist()">
+            Reset Checklist
+        </button>
+    </div>
+
+
+    <footer>
+        Checklist Seminar KP • 2026
+    </footer>
+
+</main>
+
+
+<script>
+
+    const checkboxes = document.querySelectorAll(
+        'input[type="checkbox"]'
+    );
+
+    function updateProgress() {
+
+        const total = checkboxes.length;
+
+        const completed = [...checkboxes]
+            .filter(cb => cb.checked)
+            .length;
+
+        const percentage =
+            total === 0
+                ? 0
+                : Math.round((completed / total) * 100);
+
+        document.getElementById("progressText").textContent =
+            `${completed} / ${total} (${percentage}%)`;
+
+        document.getElementById("progressFill").style.width =
+            `${percentage}%`;
+
+        checkboxes.forEach(cb => {
+
+            const item = cb.closest(".item");
+
+            if (cb.checked) {
+                item.classList.add("checked");
+            } else {
+                item.classList.remove("checked");
+            }
+
+        });
+    }
+
+
+    function saveChecklist() {
+
+        const data = {};
+
+        checkboxes.forEach(cb => {
+            data[cb.id] = cb.checked;
+        });
+
+        localStorage.setItem(
+            "seminarKPChecklist",
+            JSON.stringify(data)
+        );
+
+        updateProgress();
+    }
+
+
+    function loadChecklist() {
+
+        const saved =
+            localStorage.getItem("seminarKPChecklist");
+
+        if (!saved) {
+            updateProgress();
+            return;
+        }
+
+        const data = JSON.parse(saved);
+
+        checkboxes.forEach(cb => {
+
+            if (data[cb.id] !== undefined) {
+                cb.checked = data[cb.id];
+            }
+
+        });
+
+        updateProgress();
+    }
+
+
+    function resetChecklist() {
+
+        const confirmReset = confirm(
+            "Yakin ingin menghapus semua checklist?"
+        );
+
+        if (!confirmReset) return;
+
+        checkboxes.forEach(cb => {
+            cb.checked = false;
+        });
+
+        localStorage.removeItem("seminarKPChecklist");
+
+        updateProgress();
+    }
+
+
+    checkboxes.forEach(cb => {
+
+        cb.addEventListener("change", saveChecklist);
+
+    });
+
+
+    /* COUNTDOWN */
+
+    function updateCountdown() {
+
+        const deadline =
+            new Date("2026-10-08T23:55:00+07:00");
+
+        const now = new Date();
+
+        const difference =
+            deadline - now;
+
+        const countdown =
+            document.getElementById("countdown");
+
+        if (difference <= 0) {
+
+            countdown.textContent =
+                "⏰ Deadline sudah lewat";
+
+            return;
+        }
+
+        const hours =
+            Math.floor(
+                difference / (1000 * 60 * 60)
+            );
+
+        const minutes =
+            Math.floor(
+                (difference / (1000 * 60)) % 60
+            );
+
+        const seconds =
+            Math.floor(
+                (difference / 1000) % 60
+            );
+
+        countdown.textContent =
+            `⏳ ${hours}j ${minutes}m ${seconds}d lagi`;
+
+    }
+
+
+    loadChecklist();
+
+    updateCountdown();
+
+    setInterval(updateCountdown, 1000);
+
+</script>
+
+</body>
+</html>
+```
