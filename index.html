@@ -220,7 +220,15 @@
         .actions {
             display: flex;
             justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
             margin: 20px 0 40px;
+        }
+
+        .sync-status {
+            margin-right: auto;
+            color: #64748b;
+            font-size: 13px;
         }
 
         button {
@@ -737,6 +745,10 @@
 
 
     <div class="actions">
+        <span class="sync-status" id="syncStatus">
+            Menyiapkan sinkronisasi...
+        </span>
+
         <button onclick="resetChecklist()">
             Reset Checklist
         </button>
@@ -750,7 +762,64 @@
 </main>
 
 
-<script>
+<script type="module">
+
+    /*
+        Agar checklist bisa terlihat sama saat dibuka dari website/perangkat lain,
+        data harus disimpan di server bersama. Isi firebaseConfig di bawah ini
+        dengan konfigurasi Firebase Web App milikmu.
+
+        Langkah singkat:
+        1. Buka https://console.firebase.google.com
+        2. Buat project
+        3. Buat Realtime Database
+        4. Buat Web App, lalu salin firebaseConfig ke bawah
+        5. Untuk testing, set rules Realtime Database:
+
+           {
+             "rules": {
+               "seminarKPChecklist": {
+                 ".read": true,
+                 ".write": true
+               }
+             }
+           }
+
+        Catatan: rules di atas cocok untuk link privat/testing. Kalau link publik,
+        sebaiknya pakai login atau rules yang lebih ketat.
+    */
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import {
+        getDatabase,
+        ref,
+        onValue,
+        set
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "ISI_API_KEY",
+        authDomain: "ISI_PROJECT_ID.firebaseapp.com",
+        databaseURL: "https://ISI_PROJECT_ID-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "ISI_PROJECT_ID",
+        storageBucket: "ISI_PROJECT_ID.appspot.com",
+        messagingSenderId: "ISI_MESSAGING_SENDER_ID",
+        appId: "ISI_APP_ID"
+    };
+
+    const checklistRoom =
+        new URLSearchParams(window.location.search).get("room")
+        || "seminar-kp-2026";
+
+    const storageKey = `seminarKPChecklist:${checklistRoom}`;
+    const syncStatus = document.getElementById("syncStatus");
+    const isFirebaseConfigured =
+        !firebaseConfig.apiKey.startsWith("ISI_")
+        && !firebaseConfig.projectId.startsWith("ISI_")
+        && !firebaseConfig.appId.startsWith("ISI_");
+
+    let checklistRef = null;
+    let isLoadingRemoteData = false;
 
     const checkboxes = document.querySelectorAll(
         'input[type="checkbox"]'
@@ -797,10 +866,19 @@
             data[cb.id] = cb.checked;
         });
 
-        localStorage.setItem(
-            "seminarKPChecklist",
-            JSON.stringify(data)
-        );
+        localStorage.setItem(storageKey, JSON.stringify(data));
+
+        if (checklistRef && !isLoadingRemoteData) {
+            set(checklistRef, data)
+                .then(() => {
+                    syncStatus.textContent =
+                        `Tersinkron: ruang "${checklistRoom}"`;
+                })
+                .catch(() => {
+                    syncStatus.textContent =
+                        "Gagal sinkron ke server, data tersimpan lokal";
+                });
+        }
 
         updateProgress();
     }
@@ -808,8 +886,7 @@
 
     function loadChecklist() {
 
-        const saved =
-            localStorage.getItem("seminarKPChecklist");
+        const saved = localStorage.getItem(storageKey);
 
         if (!saved) {
             updateProgress();
@@ -830,6 +907,71 @@
     }
 
 
+    function applyChecklistData(data) {
+
+        isLoadingRemoteData = true;
+
+        checkboxes.forEach(cb => {
+            cb.checked = data?.[cb.id] === true;
+        });
+
+        isLoadingRemoteData = false;
+
+        updateProgress();
+    }
+
+
+    function startSharedChecklist() {
+
+        if (!isFirebaseConfigured) {
+            syncStatus.textContent =
+                "Mode lokal: isi firebaseConfig agar bisa dibuka bersama";
+            loadChecklist();
+            return;
+        }
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const database = getDatabase(app);
+
+            checklistRef = ref(
+                database,
+                `seminarKPChecklist/${checklistRoom}`
+            );
+
+            syncStatus.textContent =
+                `Menghubungkan ruang "${checklistRoom}"...`;
+
+            onValue(
+                checklistRef,
+                snapshot => {
+                    const data = snapshot.val();
+
+                    if (data) {
+                        localStorage.setItem(storageKey, JSON.stringify(data));
+                        applyChecklistData(data);
+                    } else {
+                        loadChecklist();
+                        saveChecklist();
+                    }
+
+                    syncStatus.textContent =
+                        `Tersinkron: ruang "${checklistRoom}"`;
+                },
+                () => {
+                    syncStatus.textContent =
+                        "Tidak bisa terhubung, memakai data lokal";
+                    loadChecklist();
+                }
+            );
+        } catch (error) {
+            syncStatus.textContent =
+                "Konfigurasi Firebase belum benar, memakai data lokal";
+            loadChecklist();
+        }
+    }
+
+
     function resetChecklist() {
 
         const confirmReset = confirm(
@@ -842,7 +984,11 @@
             cb.checked = false;
         });
 
-        localStorage.removeItem("seminarKPChecklist");
+        localStorage.removeItem(storageKey);
+
+        if (checklistRef) {
+            set(checklistRef, {});
+        }
 
         updateProgress();
     }
@@ -899,7 +1045,9 @@
     }
 
 
-    loadChecklist();
+    window.resetChecklist = resetChecklist;
+
+    startSharedChecklist();
 
     updateCountdown();
 
